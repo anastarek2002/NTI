@@ -2,24 +2,45 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# --- Display Elements (slide 03) ---
-st.title("Sales Dashboard")
-st.markdown("Revenue is **up 12%** this quarter.")
-st.write({"users": 1280, "growth": 0.12})
+# --- Layout (slide 05) ---
+with st.sidebar:
+    theme = st.radio("Theme", ["Light", "Dark"])
+    steps = st.slider("Steps", 10, 500, 100)
+    seed = st.number_input("Seed", value=42)
 
-df = pd.DataFrame({
-    "month": ["Jan", "Feb", "Mar", "Apr", "May"],
-    "revenue": [12000, 15000, 13500, 18000, 21000],
-})
-st.dataframe(df)
-st.metric("Revenue", "$48.2k", "+12%")
-st.line_chart(df.set_index("month"))
+c1, c2, c3 = st.columns(3)
 
-# --- Input Widgets (slide 04) ---
-name = st.text_input("Name")
-age = st.slider("Age", 0, 100, 25)
-agree = st.checkbox("I accept the terms")
-flavor = st.selectbox("Pick one", ["Vanilla", "Mango", "Mint"])
+# --- State & Caching (slide 06) ---
+@st.cache_data
+def load_data(path):
+    return pd.read_csv(path) if False else None
 
-if st.button("Submit"):
-    st.write(f"{name} is {age} and likes {flavor}.")
+if "count" not in st.session_state:
+    st.session_state.count = 0
+if st.button("+1"):
+    st.session_state.count += 1
+
+# --- Full Example (slide 07) ---
+st.title("Random Walk Explorer")
+
+np.random.seed(int(seed))
+walk = np.random.randn(int(steps)).cumsum()
+df = pd.DataFrame({"value": walk})
+
+c1.metric("Final value", f"{walk[-1]:.2f}")
+c2.metric("Max", f"{walk.max():.2f}")
+c3.metric("Min", f"{walk.min():.2f}")
+
+st.line_chart(df)
+
+with st.expander("See details"):
+    st.write(f"Steps: {steps}, Seed: {seed}, Theme: {theme}")
+    st.dataframe(df)
+
+tab1, tab2 = st.tabs(["Chart", "Data"])
+with tab1:
+    st.line_chart(df)
+with tab2:
+    st.dataframe(df)
+
+st.write(f"Button clicks: {st.session_state.count}")
