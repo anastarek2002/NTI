@@ -1,2 +1,5 @@
 import numpy as np   
-print("its working")
+def helloworld(x):  
+    print(x)
+helloworld(3)
+("its working")
