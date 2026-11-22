@@ -1,5 +1,5 @@
 import numpy as np   
-def helloworld(x=20 , y=10):  
+def helloworld(x=30 , y=20):  
     print(x)
 helloworld()
-("its working")
+print("its working")
